@@ -309,7 +309,6 @@
           </svg>
           <span>Reproducir y guardar audio</span>
         </button>
-        <!-- El botón de "Guardar audio" se omite porque el proceso se inicia al presionar "Reproducir y guardar audio" -->
       </div>
       <div id="upload-status" class="upload-status"></div>
       <div id="download-container" class="download-link"></div>
@@ -382,17 +381,8 @@
     }
 
     /* ===================================================
-       Sección: Texto a Voz con meSpeak.js y subida a TransferNow
+       Sección: Texto a Voz con meSpeak.js y descarga local
     =================================================== */
-
-    // Configuración de la API TransferNow
-    const TRANSFERNOW_API_KEY = '50543a93-9a89-4030-945e-c752b1cd019d';
-    const API_ENDPOINT = 'https://transfernow.net/api/v1/transfers';
-
-    const speakButton = document.getElementById("speak-btn");
-    const textToSpeech = document.getElementById("text-to-speech");
-    const uploadStatus = document.getElementById("upload-status");
-    const downloadContainer = document.getElementById("download-container");
 
     // Función para convertir DataURI a Blob
     function dataURItoBlob(dataURI) {
@@ -406,37 +396,18 @@
       return new Blob([ab], { type: mimeString });
     }
 
-    // Función para subir el audio a TransferNow
-    const uploadToTransferNow = async (blob) => {
-      try {
-        uploadStatus.textContent = "Subiendo audio...";
-        
-        const formData = new FormData();
-        formData.append('file', blob, `audio_${Date.now()}.wav`);
-        formData.append('description', 'Audio generado por Voice Assistant Pro');
-
-        const response = await fetch(API_ENDPOINT, {
-          method: 'POST',
-          headers: {
-            'X-Api-Key': TRANSFERNOW_API_KEY
-          },
-          body: formData
-        });
-
-        if (!response.ok) throw new Error('Error en la subida');
-        
-        const data = await response.json();
-        showDownloadLink(data.download_url);
-        uploadStatus.textContent = "Subida completada!";
-      } catch (error) {
-        console.error('Error:', error);
-        uploadStatus.textContent = "Error al subir el archivo";
-        setTimeout(() => uploadStatus.textContent = "", 3000);
-      }
-    };
-
-    const showDownloadLink = (url) => {
-      downloadContainer.innerHTML = `
+    // Función para descargar el audio en el dispositivo
+    const downloadAudio = (blob) => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `audio_${Date.now()}.wav`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      // También se muestra un enlace de descarga en pantalla
+      document.getElementById("download-container").innerHTML = `
         <a href="${url}" target="_blank" rel="noopener">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
@@ -452,19 +423,23 @@
       console.log("Voz en español cargada en meSpeak");
     });
 
-    // Al presionar el botón se genera el audio mediante meSpeak y se sube a TransferNow
+    const speakButton = document.getElementById("speak-btn");
+    const textToSpeech = document.getElementById("text-to-speech");
+    const uploadStatus = document.getElementById("upload-status");
+
     speakButton.addEventListener("click", () => {
       const text = textToSpeech.value;
       if (text) {
         uploadStatus.textContent = "Generando audio...";
-        downloadContainer.innerHTML = '';
+        document.getElementById("download-container").innerHTML = '';
         try {
-          // Se genera el audio en formato raw y se crea un WAV (data URI)
+          // Genera el audio en formato raw y crea un WAV (Data URI)
           const rawdata = meSpeak.speak(text, { rawdata: true });
           const wavDataURI = meSpeak.createWav(rawdata);
           const audioBlob = dataURItoBlob(wavDataURI);
-          // Se sube el blob a TransferNow
-          uploadToTransferNow(audioBlob);
+          uploadStatus.textContent = "Audio generado correctamente.";
+          // Descarga automática y muestra enlace de descarga
+          downloadAudio(audioBlob);
         } catch(err) {
           console.error("Error generando audio con meSpeak:", err);
           uploadStatus.textContent = "Error generando audio";
