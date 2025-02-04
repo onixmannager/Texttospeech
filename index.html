@@ -264,6 +264,8 @@
       }
     }
   </style>
+  <!-- Incluir meSpeak.js (asegúrate de que la ruta sea correcta) -->
+  <script src="mespeak.min.js"></script>
 </head>
 <body>
   <div class="container">
@@ -296,7 +298,7 @@
       <div id="status" class="status"></div>
     </div>
 
-    <!-- Sección Texto a Voz (actualizada) -->
+    <!-- Sección Texto a Voz (usando meSpeak.js) -->
     <div class="section">
       <h2>Texto a Voz</h2>
       <textarea id="text-to-speech" placeholder="Escribe aquí..."></textarea>
@@ -305,15 +307,9 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 1v22M8 5v14M16 5v14M3 11h18"/>
           </svg>
-          <span>Reproducir</span>
+          <span>Reproducir y guardar audio</span>
         </button>
-        <button id="save-audio-btn" disabled>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-            <path d="M17 21v-8H7v8M7 3v5h8V3"/>
-          </svg>
-          <span>Guardar audio</span>
-        </button>
+        <!-- El botón de "Guardar audio" se omite porque el proceso se inicia al presionar "Reproducir y guardar audio" -->
       </div>
       <div id="upload-status" class="upload-status"></div>
       <div id="download-container" class="download-link"></div>
@@ -386,21 +382,31 @@
     }
 
     /* ===================================================
-       Sección: Texto a Voz y Grabación/Upload de Audio
-       (con integración a la API TransferNow)
+       Sección: Texto a Voz con meSpeak.js y subida a TransferNow
     =================================================== */
+
+    // Configuración de la API TransferNow
     const TRANSFERNOW_API_KEY = '50543a93-9a89-4030-945e-c752b1cd019d';
     const API_ENDPOINT = 'https://transfernow.net/api/v1/transfers';
 
     const speakButton = document.getElementById("speak-btn");
-    const saveAudioButton = document.getElementById("save-audio-btn");
     const textToSpeech = document.getElementById("text-to-speech");
     const uploadStatus = document.getElementById("upload-status");
     const downloadContainer = document.getElementById("download-container");
-    
-    let mediaRecorder;
-    let audioChunks = [];
 
+    // Función para convertir DataURI a Blob
+    function dataURItoBlob(dataURI) {
+      const byteString = atob(dataURI.split(',')[1]);
+      const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      return new Blob([ab], { type: mimeString });
+    }
+
+    // Función para subir el audio a TransferNow
     const uploadToTransferNow = async (blob) => {
       try {
         uploadStatus.textContent = "Subiendo audio...";
@@ -422,7 +428,6 @@
         const data = await response.json();
         showDownloadLink(data.download_url);
         uploadStatus.textContent = "Subida completada!";
-        
       } catch (error) {
         console.error('Error:', error);
         uploadStatus.textContent = "Error al subir el archivo";
@@ -441,59 +446,30 @@
       `;
     };
 
-    const setupAudioRecording = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const mediaStreamDestination = audioContext.createMediaStreamDestination();
-        mediaRecorder = new MediaRecorder(mediaStreamDestination.stream);
+    // Cargar la configuración y voz de meSpeak
+    meSpeak.loadConfig("mespeak_config.json");
+    meSpeak.loadVoice("voices/es.json", function() {
+      console.log("Voz en español cargada en meSpeak");
+    });
 
-        mediaRecorder.ondataavailable = (event) => {
-          audioChunks.push(event.data);
-        };
-
-        mediaRecorder.onstop = async () => {
-          const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-          await uploadToTransferNow(audioBlob);
-          audioChunks = [];
-        };
-      } catch (err) {
-        console.error('Error al configurar grabación de audio:', err);
-        uploadStatus.textContent = "Error de configuración de audio";
-      }
-    };
-
-    setupAudioRecording();
-
-    if ('speechSynthesis' in window) {
-      speakButton.addEventListener("click", () => {
-        const text = textToSpeech.value;
-        if (text) {
-          const utterance = new SpeechSynthesisUtterance(text);
-          utterance.lang = 'es-ES';
-          utterance.rate = 1;
-          
-          saveAudioButton.disabled = false;
-          downloadContainer.innerHTML = '';
-          mediaRecorder.start();
-          
-          utterance.onend = () => {
-            mediaRecorder.stop();
-            speakButton.disabled = false;
-            saveAudioButton.disabled = true;
-          };
-          
-          speechSynthesis.speak(utterance);
-          speakButton.disabled = true;
+    // Al presionar el botón se genera el audio mediante meSpeak y se sube a TransferNow
+    speakButton.addEventListener("click", () => {
+      const text = textToSpeech.value;
+      if (text) {
+        uploadStatus.textContent = "Generando audio...";
+        downloadContainer.innerHTML = '';
+        try {
+          // Se genera el audio en formato raw y se crea un WAV (data URI)
+          const rawdata = meSpeak.speak(text, { rawdata: true });
+          const wavDataURI = meSpeak.createWav(rawdata);
+          const audioBlob = dataURItoBlob(wavDataURI);
+          // Se sube el blob a TransferNow
+          uploadToTransferNow(audioBlob);
+        } catch(err) {
+          console.error("Error generando audio con meSpeak:", err);
+          uploadStatus.textContent = "Error generando audio";
         }
-      });
-    } else {
-      speakButton.disabled = true;
-      speakButton.textContent = "Función no disponible";
-    }
-
-    saveAudioButton.addEventListener("click", () => {
-      mediaRecorder.stop();
+      }
     });
   </script>
 </body>
