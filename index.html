@@ -1,9 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-
-
-   <style>
+  <meta charset="UTF-8">
+  <!-- Metaetiquetas para que se vea como una app en dispositivos móviles -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#5e35b1">
+  <title>Voice Assistant Pro</title>
+  
+  <style>
     :root {
       --primary: #5e35b1;
       --secondary: #7e57c2;
@@ -186,12 +192,12 @@
       animation: pulse 1.5s infinite;
     }
 
+    /* Media query para pantallas grandes (manteniendo el diseño general, pero se adapta a resoluciones) */
     @media (min-width: 768px) {
-     .container {
-      grid-template-columns: 1fr; /* Cambia de '1fr 1fr' a '1fr' para mantener el diseño vertical */
-      padding: 2.5rem;
-    }
-
+      .container {
+        grid-template-columns: 1fr 1fr;
+        padding: 2.5rem;
+      }
       
       .header {
         grid-column: 1 / -1;
@@ -202,6 +208,7 @@
       }
     }
 
+    /* Ajustes para móviles: se conserva el diseño pero se adapta al tamaño de la pantalla */
     @media (max-width: 480px) {
       body {
         padding: 0;
@@ -226,8 +233,7 @@
         padding: 1rem;
       }
     }
-   </style>
-  
+  </style>
 </head>
 <body>
 
@@ -279,8 +285,9 @@
       </div>
     </div>
   </div>
+  
   <script>
-    // Voz a Texto Corregido
+    // Voz a Texto
     const startButton = document.getElementById("start-btn");
     const saveButton = document.getElementById("save-btn");
     const output = document.getElementById("output");
@@ -392,7 +399,7 @@
           utterance.lang = 'es-ES';
           utterance.rate = 1;
           
-          // Iniciar grabación
+          // Iniciar grabación del audio mientras se reproduce la voz
           saveAudioButton.disabled = false;
           mediaRecorder.start();
           
