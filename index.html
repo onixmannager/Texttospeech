@@ -208,7 +208,7 @@
       }
     }
 
-    /* Ajustes para móviles: se conserva el diseño pero se adapta al tamaño de la pantalla */
+    /* Ajustes para móviles */
     @media (max-width: 480px) {
       body {
         padding: 0;
@@ -287,25 +287,35 @@
   </div>
   
   <script>
-    // Voz a Texto
+    /* ---------------------------
+       Voz a Texto – Reconocimiento de voz
+       --------------------------- */
+    let finalTranscriptGlobal = "";
+    let isRecording = false;
     const startButton = document.getElementById("start-btn");
     const saveButton = document.getElementById("save-btn");
     const output = document.getElementById("output");
     const status = document.getElementById("status");
-    let recognition;
-    let isRecording = false;
 
     if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-      recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
       recognition.continuous = true;
       recognition.interimResults = true;
       recognition.lang = "es-ES";
 
       recognition.onstart = () => {
+        finalTranscriptGlobal = "";
         startButton.innerHTML = `<span class="mic-icon"></span><span>Detener grabación</span>`;
         startButton.classList.add('recording');
         status.textContent = "Grabando...";
-        saveButton.disabled = false;
+        // Se deshabilita el botón de guardar mientras se graba
+        saveButton.disabled = true;
+      };
+
+      recognition.onerror = (event) => {
+        console.error("Error en el reconocimiento:", event.error);
+        status.textContent = "Error: " + event.error;
       };
 
       recognition.onend = () => {
@@ -313,22 +323,23 @@
         startButton.classList.remove('recording');
         status.textContent = "Grabación detenida";
         isRecording = false;
+        // Habilitamos el botón de guardar si se obtuvo alguna transcripción
+        if (finalTranscriptGlobal.trim().length > 0) {
+          saveButton.disabled = false;
+        }
       };
 
       recognition.onresult = (event) => {
-        let finalTranscript = '';
-        let interimTranscript = '';
-
+        let interimTranscript = "";
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const transcript = event.results[i][0].transcript;
           if (event.results[i].isFinal) {
-            finalTranscript += transcript + ' ';
+            finalTranscriptGlobal += transcript + " ";
           } else {
             interimTranscript += transcript;
           }
         }
-
-        output.value = finalTranscript + interimTranscript;
+        output.value = finalTranscriptGlobal + interimTranscript;
         output.scrollTop = output.scrollHeight;
       };
 
@@ -337,7 +348,8 @@
           recognition.stop();
           isRecording = false;
         } else {
-          output.value = '';
+          output.value = "";
+          finalTranscriptGlobal = "";
           recognition.start();
           isRecording = true;
         }
@@ -356,19 +368,20 @@
       status.textContent = "Navegador no compatible con reconocimiento de voz";
     }
 
-    // Texto a Voz y Grabación de Audio
+    /* ---------------------------
+       Texto a Voz – Reproducción y grabación
+       --------------------------- */
     const speakButton = document.getElementById("speak-btn");
     const saveAudioButton = document.getElementById("save-audio-btn");
     const textToSpeech = document.getElementById("text-to-speech");
     let mediaRecorder;
     let audioChunks = [];
 
+    // Se usa getUserMedia para capturar audio (nota: grabar la salida de speechSynthesis es complejo)
     const setupAudioRecording = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const mediaStreamDestination = audioContext.createMediaStreamDestination();
-        mediaRecorder = new MediaRecorder(mediaStreamDestination.stream);
+        mediaRecorder = new MediaRecorder(stream);
 
         mediaRecorder.ondataavailable = (event) => {
           audioChunks.push(event.data);
@@ -399,7 +412,7 @@
           utterance.lang = 'es-ES';
           utterance.rate = 1;
           
-          // Iniciar grabación del audio mientras se reproduce la voz
+          // Iniciamos la grabación antes de reproducir el texto
           saveAudioButton.disabled = false;
           mediaRecorder.start();
           
@@ -419,7 +432,9 @@
     }
 
     saveAudioButton.addEventListener("click", () => {
-      mediaRecorder.stop();
+      if (mediaRecorder && mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+      }
     });
   </script>
 </body>
