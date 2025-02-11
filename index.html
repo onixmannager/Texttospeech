@@ -187,10 +187,11 @@
     }
 
     @media (min-width: 768px) {
-      .container {
-        grid-template-columns: 1fr 1fr;
-        padding: 2.5rem;
-      }
+     .container {
+      grid-template-columns: 1fr; /* Cambia de '1fr 1fr' a '1fr' para mantener el diseño vertical */
+      padding: 2.5rem;
+    }
+
       
       .header {
         grid-column: 1 / -1;
