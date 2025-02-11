@@ -2,13 +2,9 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <!-- Metaetiquetas para que se vea como una app en dispositivos móviles -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#5e35b1">
   <title>Voice Assistant Pro</title>
-  
   <style>
     :root {
       --primary: #5e35b1;
@@ -182,6 +178,7 @@
       clip-path: polygon(0 0, 100% 0, 75% 100%, 25% 100%);
     }
 
+    /* Animaciones */
     @keyframes pulse {
       0% { transform: scale(1); }
       50% { transform: scale(1.05); }
@@ -192,7 +189,7 @@
       animation: pulse 1.5s infinite;
     }
 
-    /* Media query para pantallas grandes (manteniendo el diseño general, pero se adapta a resoluciones) */
+    /* Responsive Design */
     @media (min-width: 768px) {
       .container {
         grid-template-columns: 1fr 1fr;
@@ -208,7 +205,6 @@
       }
     }
 
-    /* Ajustes para móviles */
     @media (max-width: 480px) {
       body {
         padding: 0;
@@ -236,16 +232,14 @@
   </style>
 </head>
 <body>
-
-  <div class="container">
-    <div class="header">
+   <div class="header">
       <h1>
         <span class="mic-icon"></span>
         <span>Voice Assistant Pro</span>
       </h1>
     </div>
-
-    <div class="section">
+    
+     <div class="section">
       <h2>Voz a Texto</h2>
       <textarea id="output" readonly placeholder="Hable ahora..."></textarea>
       <div class="button-group">
@@ -275,167 +269,87 @@
           </svg>
           <span>Reproducir</span>
         </button>
-        <button id="save-audio-btn" disabled>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-            <path d="M17 21v-8H7v8M7 3v5h8V3"/>
-          </svg>
-          <span>Guardar audio</span>
-        </button>
       </div>
     </div>
   </div>
-  
+
   <script>
-    /* ---------------------------
-       Voz a Texto – Reconocimiento de voz
-       --------------------------- */
-    let finalTranscriptGlobal = "";
-    let isRecording = false;
+    // Variables para Voz a Texto
     const startButton = document.getElementById("start-btn");
     const saveButton = document.getElementById("save-btn");
     const output = document.getElementById("output");
     const status = document.getElementById("status");
+    let recognition;
+    let transcript = "";
 
+    // Verificar si la API SpeechRecognition está disponible
     if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      const recognition = new SpeechRecognition();
+      recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
       recognition.continuous = true;
       recognition.interimResults = true;
-      recognition.lang = "es-ES";
+      recognition.lang = "es-ES"; // Configurar el idioma a español
 
-      recognition.onstart = () => {
-        finalTranscriptGlobal = "";
-        startButton.innerHTML = `<span class="mic-icon"></span><span>Detener grabación</span>`;
-        startButton.classList.add('recording');
+      recognition.onstart = function () {
+        startButton.textContent = "Detener Grabación";
         status.textContent = "Grabando...";
-        // Se deshabilita el botón de guardar mientras se graba
-        saveButton.disabled = true;
+        startButton.disabled = false;
+        saveButton.disabled = false;
       };
 
-      recognition.onerror = (event) => {
-        console.error("Error en el reconocimiento:", event.error);
-        status.textContent = "Error: " + event.error;
+      recognition.onend = function () {
+        startButton.textContent = "Empezar a Hablar";
+        status.textContent = "Detener";
+        startButton.disabled = false;
       };
 
-      recognition.onend = () => {
-        startButton.innerHTML = `<span class="mic-icon"></span><span>Iniciar grabación</span>`;
-        startButton.classList.remove('recording');
-        status.textContent = "Grabación detenida";
-        isRecording = false;
-        // Habilitamos el botón de guardar si se obtuvo alguna transcripción
-        if (finalTranscriptGlobal.trim().length > 0) {
-          saveButton.disabled = false;
-        }
-      };
-
-      recognition.onresult = (event) => {
-        let interimTranscript = "";
+      recognition.onresult = function (event) {
+        let newTranscript = "";
         for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            finalTranscriptGlobal += transcript + " ";
-          } else {
-            interimTranscript += transcript;
-          }
+          newTranscript += event.results[i][0].transcript;
         }
-        output.value = finalTranscriptGlobal + interimTranscript;
-        output.scrollTop = output.scrollHeight;
+        transcript = newTranscript;
+        output.value = transcript;
       };
 
-      startButton.addEventListener("click", () => {
-        if (isRecording) {
+      // Comenzar o detener grabación
+      startButton.addEventListener("click", function () {
+        if (recognition.running) {
           recognition.stop();
-          isRecording = false;
         } else {
-          output.value = "";
-          finalTranscriptGlobal = "";
           recognition.start();
-          isRecording = true;
         }
       });
 
-      saveButton.addEventListener("click", () => {
-        const blob = new Blob([output.value], { type: "text/plain" });
+      // Guardar el texto como un archivo .txt
+      saveButton.addEventListener("click", function () {
+        const blob = new Blob([transcript], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `transcripcion_${new Date().toISOString().slice(0,10)}.txt`;
+        a.download = "transcripcion.txt";
         a.click();
-        URL.revokeObjectURL(url);
+        URL.revokeObjectURL(url); // Liberar el objeto URL
       });
     } else {
-      status.textContent = "Navegador no compatible con reconocimiento de voz";
+      alert("Tu navegador no soporta el reconocimiento de voz.");
     }
 
-    /* ---------------------------
-       Texto a Voz – Reproducción y grabación
-       --------------------------- */
+    // Variables para Texto a Voz
     const speakButton = document.getElementById("speak-btn");
-    const saveAudioButton = document.getElementById("save-audio-btn");
     const textToSpeech = document.getElementById("text-to-speech");
-    let mediaRecorder;
-    let audioChunks = [];
 
-    // Se usa getUserMedia para capturar audio (nota: grabar la salida de speechSynthesis es complejo)
-    const setupAudioRecording = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream);
-
-        mediaRecorder.ondataavailable = (event) => {
-          audioChunks.push(event.data);
-        };
-
-        mediaRecorder.onstop = () => {
-          const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-          const audioUrl = URL.createObjectURL(audioBlob);
-          const a = document.createElement('a');
-          a.href = audioUrl;
-          a.download = `audio_${new Date().toISOString().slice(0,10)}.wav`;
-          a.click();
-          URL.revokeObjectURL(audioUrl);
-          audioChunks = [];
-        };
-      } catch (err) {
-        console.error('Error al configurar grabación de audio:', err);
-      }
-    };
-
-    setupAudioRecording();
-
+    // Verificar si la API SpeechSynthesis está disponible
     if ('speechSynthesis' in window) {
-      speakButton.addEventListener("click", () => {
+      speakButton.addEventListener("click", function () {
         const text = textToSpeech.value;
-        if (text) {
+        if (text !== "") {
           const utterance = new SpeechSynthesisUtterance(text);
-          utterance.lang = 'es-ES';
-          utterance.rate = 1;
-          
-          // Iniciamos la grabación antes de reproducir el texto
-          saveAudioButton.disabled = false;
-          mediaRecorder.start();
-          
-          utterance.onend = () => {
-            mediaRecorder.stop();
-            speakButton.disabled = false;
-            saveAudioButton.disabled = true;
-          };
-          
           speechSynthesis.speak(utterance);
-          speakButton.disabled = true;
         }
       });
     } else {
-      speakButton.disabled = true;
-      speakButton.textContent = "Función no disponible";
+      alert("Tu navegador no soporta la función de texto a voz.");
     }
-
-    saveAudioButton.addEventListener("click", () => {
-      if (mediaRecorder && mediaRecorder.state === "recording") {
-        mediaRecorder.stop();
-      }
-    });
   </script>
 </body>
-</html>
+</html
