@@ -280,130 +280,139 @@
   </div>
 
   
-      
-
   <script>
-    // Voz a Texto Corregido
-    const startButton = document.getElementById("start-btn");
-    const saveButton = document.getElementById("save-btn");
-    const output = document.getElementById("output");
-    const status = document.getElementById("status");
-    let recognition;
-    let isRecording = false;
 
-    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-      recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = "es-ES";
+  // Voz a Texto
+const startButton = document.getElementById("start-btn");
+const saveButton = document.getElementById("save-btn");
+const output = document.getElementById("output");
+const status = document.getElementById("status");
+let recognition;
+let transcript = "";
 
-      recognition.onstart = () => {
-        startButton.innerHTML = `<span class="mic-icon"></span><span>Detener grabación</span>`;
-        startButton.classList.add('recording');
-        status.textContent = "Grabando...";
-        saveButton.disabled = false;
-      };
+if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+  recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = "es-ES";
 
-      recognition.onend = () => {
-        startButton.innerHTML = `<span class="mic-icon"></span><span>Iniciar grabación</span>`;
-        startButton.classList.remove('recording');
-        status.textContent = "Grabación detenida";
-        isRecording = false;
-      };
+  recognition.onstart = () => {
+    startButton.innerHTML = `<span class="mic-icon"></span><span>Detener grabación</span>`;
+    startButton.classList.add('recording');
+    status.textContent = "Grabando...";
+    saveButton.disabled = false;
+  };
 
-      recognition.onresult = (event) => {
-        let finalTranscript = '';
-        let interimTranscript = '';
+  recognition.onend = () => {
+    startButton.innerHTML = `<span class="mic-icon"></span><span>Iniciar grabación</span>`;
+    startButton.classList.remove('recording');
+    status.textContent = "Grabación detenida";
+  };
 
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            finalTranscript += transcript + ' ';
-          } else {
-            interimTranscript += transcript;
-          }
-        }
-
-        output.value = finalTranscript + interimTranscript;
-        output.scrollTop = output.scrollHeight;
-      };
-
-      startButton.addEventListener("click", () => {
-        if (isRecording) {
-          recognition.stop();
-          isRecording = false;
-        } else {
-          output.value = '';
-          recognition.start();
-          isRecording = true;
-        }
-      });
-
-      saveButton.addEventListener("click", () => {
-        const blob = new Blob([output.value], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `transcripcion_${new Date().toISOString().slice(0,10)}.txt`;
-        a.click();
-        URL.revokeObjectURL(url);
-      });
-    } else {
-      status.textContent = "Navegador no compatible con reconocimiento de voz";
-    }
-
-    // Texto a Voz Corregido usando API
-    const speakButton = document.getElementById("speak-btn");
-    const saveAudioButton = document.getElementById("save-audio-btn");
-    const textToSpeech = document.getElementById("text-to-speech");
-    let audioBlob = null;
-
-    async function convertTextToSpeech(text) {
-      const API_KEY = '394ed7c94db24bffbd145ccb522c6b77'; // Obtén una clave gratis en voicerss.org
-      const response = await fetch(
-        `https://api.voicerss.org/?key=${API_KEY}&hl=es-es&src=${encodeURIComponent(text)}`
-      );
-      
-      if (!response.ok) throw new Error('Error en la conversión');
-      return await response.blob();
-    }
-
-    speakButton.addEventListener("click", async () => {
-      const text = textToSpeech.value.trim();
-      if (!text) return;
-
-      speakButton.disabled = true;
-      status.textContent = "Generando audio...";
-
-      try {
-        audioBlob = await convertTextToSpeech(text);
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const audio = new Audio(audioUrl);
-        
-        audio.addEventListener('ended', () => {
-          speakButton.disabled = false;
-          status.textContent = "Audio generado correctamente";
-        });
-        
-        audio.play();
-        saveAudioButton.disabled = false;
-      } catch (error) {
-        console.error(error);
-        status.textContent = "Error al generar el audio";
-        speakButton.disabled = false;
+  recognition.onresult = (event) => {
+    let interim = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const transcript = event.results[i][0].transcript;
+      if (event.results[i].isFinal) {
+        output.value += transcript + ' ';
+      } else {
+        interim += transcript;
       }
+    }
+    output.value = output.value + interim;
+    output.scrollTop = output.scrollHeight;
+  };
+
+  startButton.addEventListener("click", () => {
+    if (recognition.running) {
+      recognition.stop();
+    } else {
+      output.value = '';
+      recognition.start();
+    }
+  });
+
+  saveButton.addEventListener("click", () => {
+    const blob = new Blob([output.value], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `transcripcion_${new Date().toISOString().slice(0,10)}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+} else {
+  status.textContent = "Navegador no compatible con reconocimiento de voz";
+}
+
+// Texto a Voz utilizando la API de Google Cloud Text-to-Speech
+const speakButton = document.getElementById("speak-btn");
+const saveAudioButton = document.getElementById("save-audio-btn");
+const textToSpeech = document.getElementById("text-to-speech");
+let audioBlob;
+
+const convertTextToSpeech = async (text) => {
+  const apiKey = 'TU_CLAVE_DE_API_DE_GOOGLE_CLOUD'; // Reemplaza con tu clave de API de Google Cloud
+  const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`;
+
+  const requestBody = {
+    input: { text },
+    voice: { languageCode: 'es-ES', ssmlGender: 'NEUTRAL' },
+    audioConfig: { audioEncoding: 'MP3' }
+  };
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(requestBody)
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error en la solicitud: ${response.statusText}`);
+  }
+
+  const result = await response.json();
+  const audioContent = result.audioContent;
+  const audioBuffer = Uint8Array.from(atob(audioContent), char => char.charCodeAt(0));
+  return new Blob([audioBuffer], { type: 'audio/mp3' });
+};
+
+speakButton.addEventListener("click", async () => {
+  const text = textToSpeech.value;
+  if (!text) return;
+
+  speakButton.disabled = true;
+  status.textContent = "Generando audio...";
+
+  try {
+    audioBlob = await convertTextToSpeech(text);
+    const audioUrl = URL.createObjectURL(audioBlob);
+    const audio = new Audio(audioUrl);
+
+    audio.addEventListener('ended', () => {
+      speakButton.disabled = false;
+      status.textContent = "Audio generado correctamente";
     });
 
-    saveAudioButton.addEventListener("click", () => {
-      if (!audioBlob) return;
-      
-      const url = URL.createObjectURL(audioBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `audio_${new Date().toISOString().slice(0,10)}.mp3`;
-      a.click();
-      URL.revokeObjectURL(url);
-    });
-  </script>
+    audio.play();
+    saveAudioButton.disabled = false;
+  } catch (error) {
+    console.error(error);
+    status.textContent = "Error al generar el audio";
+    speakButton.disabled = false;
+  }
+});
+
+saveAudioButton.addEventListener("click", () => {
+  if (!audioBlob) return;
+
+  const url = URL.createObjectURL(audioBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `audio_${new Date().toISOString().slice(0,10)}.mp3`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+ </script>
 </body>
 </html>
