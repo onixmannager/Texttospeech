@@ -1,37 +1,30 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
+<html lang="es">  
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="Voice Assistant Pro es una herramienta avanzada de voz a texto y texto a voz, que permite a los usuarios convertir sus palabras en texto escrito y convertir texto en voz con facilidad. Ideal para transcripciones rápidas y accesibilidad.">
+<meta name="keywords" content="voz a texto, texto a voz, asistente de voz, transcripción, accesibilidad, reconocimiento de voz, tecnología de voz, speech to text, text to speech">
+<meta name="author" content="Voice Assistant Pro Team">
+<meta property="og:title" content="Voice Assistant Pro">
+<meta property="og:description" content="Convierta fácilmente voz a texto y texto a voz. Optimizado para transcripciones rápidas y accesibilidad. Disponible para dispositivos móviles.">
+<meta property="og:image" content="URL_DE_IMAGEN_AQUI">
+<meta property="og:type" content="website">
+<meta property="og:url" content="URL_DE_TU_WEB_AQUI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Voice Assistant Pro">
+<meta name="twitter:description" content="Convierte voz a texto y texto a voz con facilidad. Herramienta perfecta para la transcripción rápida y accesibilidad.">
+<meta name="twitter:image" content="URL_DE_IMAGEN_AQUI">
+<meta name="twitter:site" content="@tu_usuario_de_twitter">
+<meta name="twitter:creator" content="@tu_usuario_de_twitter">  <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="icono.png">
+<title>Voice Assistant Pro</title><head>
   <meta charset="UTF-8">
-  <!-- Meta tags mejorados para mobile -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#5e35b1">
-  <meta name="mobile-web-app-capable" content="yes">
-  
-  <!-- Metadatos SEO -->
-  <meta name="description" content="Voice Assistant Pro es una herramienta avanzada de voz a texto y texto a voz, que permite a los usuarios convertir sus palabras en texto escrito y convertir texto en voz con facilidad. Ideal para transcripciones rápidas y accesibilidad.">
-  <meta name="keywords" content="voz a texto, texto a voz, asistente de voz, transcripción, accesibilidad, reconocimiento de voz, tecnología de voz, speech to text, text to speech">
-  <meta name="author" content="Voice Assistant Pro Team">
-  
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="URL_DE_TU_WEB_AQUI">
-  <meta property="og:title" content="Voice Assistant Pro">
-  <meta property="og:description" content="Convierta fácilmente voz a texto y texto a voz. Optimizado para transcripciones rápidas y accesibilidad. Disponible para dispositivos móviles.">
-  <meta property="og:image" content="URL_DE_IMAGEN_AQUI">
-
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="URL_DE_TU_WEB_AQUI">
-  <meta property="twitter:title" content="Voice Assistant Pro">
-  <meta property="twitter:description" content="Convierte voz a texto y texto a voz con facilidad. Herramienta perfecta para la transcripción rápida y accesibilidad.">
-  <meta property="twitter:image" content="URL_DE_IMAGEN_AQUI">
-
-  <link rel="icon" href="icono.png">
-  <link rel="manifest" href="manifest.json">
   <title>Voice Assistant Pro</title>
-
   <style>
     :root {
       --primary: #5e35b1;
@@ -39,364 +32,348 @@
       --accent: #ff4081;
       --background: #f5f5f5;
       --surface: #ffffff;
-    }
+    }* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-    /* Modificaciones clave para ocultar barra navegación */
-    html {
-      overflow: hidden;
-      height: 100%;
-      -webkit-tap-highlight-color: transparent;
-    }
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  min-height: 100vh;
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-    body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      min-height: 100vh;
-      min-height: -webkit-fill-available;
-      padding: 1rem;
-      margin: 0;
-      overflow: hidden;
-      -webkit-overflow-scrolling: touch;
-    }
+.container {
+  background: var(--surface);
+  width: 100%;
+  max-width: 800px;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  position: relative;
+  overflow: hidden;
+}
 
-    .container {
-      background: var(--surface);
-      width: 100%;
-      max-width: 800px;
-      border-radius: 20px;
-      padding: 2rem;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
-      position: relative;
-      overflow: hidden;
-      min-height: calc(100vh - 2rem);
-    }
+.header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
 
-    @media (max-width: 480px) {
-      body {
-        padding: 0;
-        background: var(--surface);
-      }
-      
-      .container {
-        border-radius: 0;
-        min-height: 100vh;
-        min-height: -webkit-fill-available;
-        padding: 1.5rem;
-      }
-    }
+.header h1 {
+  color: var(--primary);
+  font-size: 2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
 
-    /* Resto del CSS original mantenido */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+.section {
+  background: var(--background);
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
 
-    .header {
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
+h2 {
+  color: var(--primary);
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
 
-    .header h1 {
-      color: var(--primary);
-      font-size: 2rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
+textarea {
+  width: 100%;
+  height: 150px;
+  padding: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 1rem;
+  resize: none;
+  transition: all 0.3s ease;
+  background: var(--surface);
+}
 
-    .section {
-      background: var(--background);
-      border-radius: 15px;
-      padding: 1.5rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
+textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(94, 53, 177, 0.2);
+}
 
-    h2 {
-      color: var(--primary);
-      font-size: 1.4rem;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
 
-    textarea {
-      width: 100%;
-      height: 150px;
-      padding: 1rem;
-      border: 2px solid #e0e0e0;
-      border-radius: 12px;
-      font-size: 1rem;
-      resize: none;
-      transition: all 0.3s ease;
-      background: var(--surface);
-    }
+button {
+  background: var(--primary);
+  color: white;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
 
-    textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(94, 53, 177, 0.2);
-    }
+button:after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: rgba(255,255,255,0.1);
+  transform: scale(0);
+  transition: transform 0.3s ease;
+  border-radius: 50%;
+}
 
-    .button-group {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      margin-top: 1.5rem;
-    }
+button:hover {
+  background: var(--secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
 
-    button {
-      background: var(--primary);
-      color: white;
-      padding: 1rem 2rem;
-      border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      position: relative;
-      overflow: hidden;
-    }
+button:active:after {
+  transform: scale(1);
+}
 
-    button:after {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: rgba(255,255,255,0.1);
-      transform: scale(0);
-      transition: transform 0.3s ease;
-      border-radius: 50%;
-    }
+button:disabled {
+  background: #bdbdbd;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
 
-    button:hover {
-      background: var(--secondary);
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
+.status {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--accent);
+  text-align: center;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background: rgba(255,64,129,0.1);
+}
 
-    button:active:after {
-      transform: scale(1);
-    }
+.mic-icon {
+  width: 24px;
+  height: 24px;
+  background: var(--accent);
+  border-radius: 50%;
+  position: relative;
+}
 
-    button:disabled {
-      background: #bdbdbd;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
+.mic-icon:before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 18px;
+  background: white;
+  clip-path: polygon(0 0, 100% 0, 75% 100%, 25% 100%);
+}
 
-    .status {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      color: var(--accent);
-      text-align: center;
-      padding: 0.5rem;
-      border-radius: 8px;
-      background: rgba(255,64,129,0.1);
-    }
+/* Animaciones */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
 
-    .mic-icon {
-      width: 24px;
-      height: 24px;
-      background: var(--accent);
-      border-radius: 50%;
-      position: relative;
-    }
+.recording {
+  animation: pulse 1.5s infinite;
+}
 
-    .mic-icon:before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 12px;
-      height: 18px;
-      background: white;
-      clip-path: polygon(0 0, 100% 0, 75% 100%, 25% 100%);
-    }
+/* Responsive Design */
+@media (min-width: 768px) {
+  .container {
+    grid-template-columns: 1fr 1fr;
+    padding: 2.5rem;
+  }
+  
+  .header {
+    grid-column: 1 / -1;
+  }
+  
+  textarea {
+    height: 180px;
+  }
+}
 
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
+@media (max-width: 480px) {
+  body {
+    padding: 0;
+    background: var(--surface);
+  }
+  
+  .container {
+    border-radius: 0;
+    min-height: 100vh;
+    padding: 1.5rem;
+  }
+  
+  .header h1 {
+    font-size: 1.5rem;
+  }
+  
+  h2 {
+    font-size: 1.2rem;
+  }
+  
+  button {
+    padding: 1rem;
+  }
+}
 
-    .recording {
-      animation: pulse 1.5s infinite;
-    }
-
-    @media (min-width: 768px) {
-      .container {
-        grid-template-columns: 1fr 1fr;
-        padding: 2.5rem;
-      }
-      
-      .header {
-        grid-column: 1 / -1;
-      }
-      
-      textarea {
-        height: 180px;
-      }
-    }
   </style>
 </head>
 <body>
-  <!-- El mismo body que tenías originalmente -->
   <div class="container">
     <div class="header">
       <h1>
         <span class="mic-icon"></span>
         <span>Voice Assistant Pro</span>
       </h1>
-    </div>
-    <div class="section">
-      <h2>Voz a Texto</h2>
-      <textarea id="output" readonly placeholder="Hable ahora..."></textarea>
-      <div class="button-group">
-        <button id="start-btn">
-          <span class="mic-icon"></span>
-          <span>Iniciar grabación</span>
-        </button>
-        <button id="save-btn" disabled>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-            <polyline points="17 21 17 13 7 13 7 21"></polyline>
-            <polyline points="7 3 7 8 15 8"></polyline>
-          </svg>
-          <span>Guardar texto</span>
-        </button>
-      </div>
-      <div id="status" class="status"></div>
-    </div>
-
-    <div class="section">
-      <h2>Texto a Voz</h2>
-      <textarea id="text-to-speech" placeholder="Escribe aquí..."></textarea>
-      <div class="button-group">
-        <button id="speak-btn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 1v22M8 5v14M16 5v14M3 11h18"/>
-          </svg>
-          <span>Reproducir</span>
-        </button>
-      </div>
-    </div>
+    </div><div class="section">
+  <h2>Voz a Texto</h2>
+  <textarea id="output" readonly placeholder="Hable ahora..."></textarea>
+  <div class="button-group">
+    <button id="start-btn">
+      <span class="mic-icon"></span>
+      <span>Iniciar grabación</span>
+    </button>
+    <button id="save-btn" disabled>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+        <polyline points="7 3 7 8 15 8"></polyline>
+      </svg>
+      <span>Guardar texto</span>
+    </button>
   </div>
+  <div id="status" class="status"></div>
+</div>
 
-  <!-- Scripts -->
+<div class="section">
+  <h2>Texto a Voz</h2>
+  <textarea id="text-to-speech" placeholder="Escribe aquí..."></textarea>
+  <div class="button-group">
+    <button id="speak-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 1v22M8 5v14M16 5v14M3 11h18"/>
+      </svg>
+      <span>Reproducir</span>
+    </button>
+  </div>
+</div>
+
+  </div>
   <script>
-    // Tu código JavaScript original aquí
+    // Voz a Texto Corregido
     const startButton = document.getElementById("start-btn");
     const saveButton = document.getElementById("save-btn");
     const output = document.getElementById("output");
     const status = document.getElementById("status");
     let recognition;
-    let isRecording = false;
+    let isRecording = false;if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+  recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = "es-ES";
 
-    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-      recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = "es-ES";
+  recognition.onstart = () => {
+    startButton.innerHTML = `<span class="mic-icon"></span><span>Detener grabación</span>`;
+    startButton.classList.add('recording');
+    status.textContent = "Grabando...";
+    saveButton.disabled = false;
+  };
 
-      recognition.onstart = () => {
-        startButton.innerHTML = `<span class="mic-icon"></span><span>Detener grabación</span>`;
-        startButton.classList.add('recording');
-        status.textContent = "Grabando...";
-        saveButton.disabled = false;
-      };
+  recognition.onend = () => {
+    startButton.innerHTML = `<span class="mic-icon"></span><span>Iniciar grabación</span>`;
+    startButton.classList.remove('recording');
+    status.textContent = "Grabación detenida";
+    isRecording = false;
+  };
 
-      recognition.onend = () => {
-        startButton.innerHTML = `<span class="mic-icon"></span><span>Iniciar grabación</span>`;
-        startButton.classList.remove('recording');
-        status.textContent = "Grabación detenida";
-        isRecording = false;
-      };
+  recognition.onresult = (event) => {
+    let finalTranscript = '';
+    let interimTranscript = '';
 
-      recognition.onresult = (event) => {
-        let finalTranscript = '';
-        let interimTranscript = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const transcript = event.results[i][0].transcript;
+      if (event.results[i].isFinal) {
+        finalTranscript += transcript + ' ';
+      } else {
+        interimTranscript += transcript;
+      }
+    }
 
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            finalTranscript += transcript + ' ';
-          } else {
-            interimTranscript += transcript;
-          }
-        }
+    output.value = finalTranscript + interimTranscript;
+    output.scrollTop = output.scrollHeight;
+  };
 
-        output.value = finalTranscript + interimTranscript;
-        output.scrollTop = output.scrollHeight;
-      };
-
-      startButton.addEventListener("click", () => {
-        if (isRecording) {
-          recognition.stop();
-          isRecording = false;
-        } else {
-          output.value = '';
-          recognition.start();
-          isRecording = true;
-        }
-      });
-
-      saveButton.addEventListener("click", () => {
-        const blob = new Blob([output.value], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `transcripcion_${new Date().toISOString().slice(0,10)}.txt`;
-        a.click();
-        URL.revokeObjectURL(url);
-      });
+  startButton.addEventListener("click", () => {
+    if (isRecording) {
+      recognition.stop();
+      isRecording = false;
     } else {
-      status.textContent = "Navegador no compatible con reconocimiento de voz";
+      output.value = '';
+      recognition.start();
+      isRecording = true;
     }
+  });
 
-    // Texto a Voz
-    const speakButton = document.getElementById("speak-btn");
-    const textToSpeech = document.getElementById("text-to-speech");
+  saveButton.addEventListener("click", () => {
+    const blob = new Blob([output.value], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `transcripcion_${new Date().toISOString().slice(0,10)}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+} else {
+  status.textContent = "Navegador no compatible con reconocimiento de voz";
+}
 
-    if ('speechSynthesis' in window) {
-      speakButton.addEventListener("click", function () {
-        const text = textToSpeech.value;
-        if (text !== "") {
-          const utterance = new SpeechSynthesisUtterance(text);
-          speechSynthesis.speak(utterance);
-        }
-      });
-    } else {
-      alert("Tu navegador no soporta la función de texto a voz.");
+// Variables para Texto a Voz const speakButton = document.getElementById("speak-btn"); const textToSpeech = document.getElementById("text-to-speech");
+
+// Verificar si la API SpeechSynthesis está disponible
+if ('speechSynthesis' in window) {
+  speakButton.addEventListener("click", function () {
+    const text = textToSpeech.value;
+    if (text !== "") {
+      const utterance = new SpeechSynthesisUtterance(text);
+      speechSynthesis.speak(utterance);
     }
+  });
+} else {
+  alert("Tu navegador no soporta la función de texto a voz.");
+}
 
-    // Service Worker para PWA
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then(registration => {
-            console.log('ServiceWorker registrado');
-          })
-          .catch(err => {
-            console.log('ServiceWorker falló:', err);
-          });
-      });
-    }
   </script>
 </body>
-</html>
+</html>Que podemos hacer para ocultar la barra del navegador ??
