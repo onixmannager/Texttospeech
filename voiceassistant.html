@@ -375,5 +375,31 @@ if ('speechSynthesis' in window) {
 }
 
   </script>
+  
+
+<script>
+
+  // Función para activar el modo pantalla completa
+function enterFullscreen() {
+  if (document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen();
+  } else if (document.documentElement.mozRequestFullScreen) { // Firefox
+    document.documentElement.mozRequestFullScreen();
+  } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari y Opera
+    document.documentElement.webkitRequestFullscreen();
+  } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
+    document.documentElement.msRequestFullscreen();
+  }
+}
+
+// Iniciar pantalla completa cuando la página cargue
+window.onload = () => {
+  enterFullscreen();
+};
+</script>
+
+
+
+  
 </body>
 </html>Que podemos hacer para ocultar la barra del navegador ??
